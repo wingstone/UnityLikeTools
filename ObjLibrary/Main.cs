@@ -15,6 +15,24 @@ namespace ObjLibrary
             this.x = x;
             this.y = y;
         }
+
+        // override + operator
+        public static Vector2 operator +(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.x + b.x, a.y + b.y);
+        }
+
+        // override - operator
+        public static Vector2 operator -(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.x - b.x, a.y - b.y);
+        }
+
+        // override * operator
+        public static Vector2 operator *(Vector2 a, float b)
+        {
+            return new Vector2(a.x * b, a.y * b);
+        }
     }
 
     class Vector3
@@ -25,6 +43,24 @@ namespace ObjLibrary
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        // override + operator
+        public static Vector3 operator +(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+
+        // override - operator
+        public static Vector3 operator -(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+
+        // override * operator
+        public static Vector3 operator *(Vector3 a, float b)
+        {
+            return new Vector3(a.x * b, a.y * b, a.z * b);
         }
     }
 
@@ -38,6 +74,24 @@ namespace ObjLibrary
             this.z = z;
             this.w = w;
         }
+
+        // override + operator
+        public static Vector4 operator +(Vector4 a, Vector4 b)
+        {
+            return new Vector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+        }
+
+        // override - operator
+        public static Vector4 operator -(Vector4 a, Vector4 b)
+        {
+            return new Vector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+        }
+
+        // override * operator
+        public static Vector4 operator *(Vector4 a, float b)
+        {
+            return new Vector4(a.x * b, a.y * b, a.z * b, a.w * b);
+        }
     }
 
     class Mesh
@@ -50,7 +104,8 @@ namespace ObjLibrary
         public Vector2[] uvs1;
         public int[] triangles;
 
-        public Mesh() {
+        public Mesh()
+        {
             vertices = null;
             normals = null;
             tangents = null;
@@ -138,26 +193,116 @@ namespace ObjLibrary
             }
         }
 
-        //public static Mesh CreateSingleGrassMesh(int strioCount, float )
-        //{
-        //    Mesh mesh = new Mesh();
+        public static Mesh CreateSingleGrassMesh(int segmentCount, float width)
+        {
+            Mesh mesh = new Mesh();
+            float segmentLength = segmentCount > 0 ? 1.0f / segmentCount : 0;
+            float halfWidth = 0.5f * width;
 
-        //    mesh.m
+            // vertices
+            mesh.vertices = new Vector3[segmentCount * 2 + 1];
+            for (int i = 0; i < segmentCount; i++)
+            {
+                mesh.vertices[i * 2] = new Vector3(-halfWidth, 0, segmentLength * i);
+                mesh.vertices[i * 2 + 1] = new Vector3(halfWidth, 0, segmentLength * i);
+            }
+            mesh.vertices[segmentCount * 2] = new Vector3(0, 0, 1.0f);
 
-        //    return mesh;
-        //}
-    }
+            // indices
+            mesh.triangles = new int[(((segmentCount - 1) * 2) + 1) * 3];
+            for (int i = 0; i < segmentCount - 1; i++)
+            {
+                mesh.triangles[i * 2 * 3] = i * 2;
+                mesh.triangles[i * 2 * 3 + 1] = i * 2 + 1;
+                mesh.triangles[i * 2 * 3 + 2] = (i + 1) * 2;
 
-    internal class Directory<T1, T2>
-    {
+                mesh.triangles[(i * 2 + 1) * 3] = i * 2 + 1;
+                mesh.triangles[(i * 2 + 1) * 3 + 1] = (i + 1) * 2 + 1;
+                mesh.triangles[(i * 2 + 1) * 3 + 2] = (i + 1) * 2;
+            }
+            mesh.triangles[(segmentCount - 1) * 2 * 3] = (segmentCount - 1) * 2;
+            mesh.triangles[(segmentCount - 1) * 2 * 3 + 1] = (segmentCount - 1) * 2 + 1;
+            mesh.triangles[(segmentCount - 1) * 2 * 3 + 2] = segmentCount * 2;
+
+            return mesh;
+        }
     }
 
     class MeshTools
     {
-        public static void CopyMeshToPoints(Vector3[] points, Mesh mesh)
+        public static Mesh CopyMeshToPoints(Vector3[] points, Mesh mesh)
         {
+            Mesh outMesh = new Mesh();
             // Implementation for copying mesh to points
-            Mesh OutMesh = new Mesh();
+            if (mesh.vertices != null)
+            {
+                outMesh.vertices = new Vector3[mesh.vertices.Length * points.Length];
+            }
+            if (mesh.normals != null)
+            {
+                outMesh.normals = new Vector3[mesh.normals.Length * points.Length];
+            }
+            if (mesh.uvs0 != null)
+            {
+                outMesh.uvs0 = new Vector2[mesh.uvs0.Length * points.Length];
+            }
+            if (mesh.uvs1 != null)
+            {
+                outMesh.uvs1 = new Vector2[mesh.uvs1.Length * points.Length];
+            }
+            if (mesh.triangles != null)
+            {
+                outMesh.triangles = new int[mesh.triangles.Length * points.Length];
+            }
+            for (int i = 0; i < points.Length; i++)
+            {
+                // Copy vertices
+                if (mesh.vertices != null)
+                {
+                    for (int j = 0; j < mesh.vertices.Length; j++)
+                    {
+                        outMesh.vertices[i * mesh.vertices.Length + j] = mesh.vertices[j] + points[i];
+                    }
+                }
+
+                // Copy normals
+                if (mesh.normals != null)
+                {
+                    for (int j = 0; j < mesh.normals.Length; j++)
+                    {
+                        outMesh.normals[i * mesh.normals.Length + j] = mesh.normals[j];
+                    }
+                }
+
+                // Copy UVs
+                if (mesh.uvs0 != null)
+                {
+                    for (int j = 0; j < mesh.uvs0.Length; j++)
+                    {
+                        outMesh.uvs0[i * mesh.uvs0.Length + j] = mesh.uvs0[j];
+                    }
+                }
+
+                // Copy UVs1
+                if (mesh.uvs1 != null)
+                {
+                    for (int j = 0; j < mesh.uvs1.Length; j++)
+                    {
+                        outMesh.uvs1[i * mesh.uvs1.Length + j] = mesh.uvs1[j];
+                    }
+                }
+
+                // Copy triangles
+                if (mesh.triangles != null)
+                {
+                    for (int j = 0; j < mesh.triangles.Length; j++)
+                    {
+                        outMesh.triangles[i * mesh.triangles.Length + j] = mesh.triangles[j] + i * mesh.vertices.Length;
+                    }
+                }
+            }
+
+            return outMesh;
         }
 
         public static void WriteMeshToObj(Mesh mesh, string filePath)
@@ -253,13 +398,51 @@ namespace ObjLibrary
             }
         }
     }
-    internal class MainClass    
+
+    class RandomTools
+    {
+        static Random random = new Random();
+
+        public static float RandomFloat(float min, float max)
+        {
+            return (float)random.NextDouble() * (max - min) + min;
+        }
+
+        public static Vector2 RandomVector2(Vector2 min, Vector2 max)
+        {
+            return new Vector2(
+                RandomFloat(min.x, max.x),
+                RandomFloat(min.y, max.y)
+            );
+        }
+
+        public static Vector3 RandomVector3(Vector3 min, Vector3 max)
+        {
+            return new Vector3(
+                RandomFloat(min.x, max.x),
+                RandomFloat(min.y, max.y),
+                RandomFloat(min.z, max.z)
+            );
+        }
+    }
+
+    internal class MainClass
     {
         static void Main(string[] args)
         {
             Console.WriteLine("----------ObjLibrary Main test begin------");
+            // MeshTools.WriteMeshToObj(MeshLibrary.Cube, "Cube.obj");
 
-            MeshTools.WriteMeshToObj(MeshLibrary.Cube, "Cube.obj");
+            Mesh singleGrass = MeshLibrary.CreateSingleGrassMesh(7, 0.04f);
+            // MeshTools.WriteMeshToObj(singleGrass, "singleGrass.obj");
+
+            Vector3[] instancePoints = new Vector3[10];
+            for (int i = 0; i < instancePoints.Length; i++)
+            {
+                instancePoints[i] = RandomTools.RandomVector3(new Vector3(-1, -1, 0), new Vector3(1, 1, 0));
+            }
+            Mesh mergedMesh = MeshTools.CopyMeshToPoints(instancePoints, singleGrass);
+            MeshTools.WriteMeshToObj(mergedMesh, "mergedGrass.obj");
 
             Console.WriteLine("----------ObjLibrary Main test end------");
             Console.ReadKey();

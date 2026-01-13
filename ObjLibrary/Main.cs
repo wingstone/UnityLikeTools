@@ -3,97 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace ObjLibrary
 {
-    class Vector2
-    {
-        public float x, y;
-        public Vector2(float x, float y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-
-        // override + operator
-        public static Vector2 operator +(Vector2 a, Vector2 b)
-        {
-            return new Vector2(a.x + b.x, a.y + b.y);
-        }
-
-        // override - operator
-        public static Vector2 operator -(Vector2 a, Vector2 b)
-        {
-            return new Vector2(a.x - b.x, a.y - b.y);
-        }
-
-        // override * operator
-        public static Vector2 operator *(Vector2 a, float b)
-        {
-            return new Vector2(a.x * b, a.y * b);
-        }
-    }
-
-    class Vector3
-    {
-        public float x, y, z;
-        public Vector3(float x, float y, float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        // override + operator
-        public static Vector3 operator +(Vector3 a, Vector3 b)
-        {
-            return new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
-        }
-
-        // override - operator
-        public static Vector3 operator -(Vector3 a, Vector3 b)
-        {
-            return new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
-        }
-
-        // override * operator
-        public static Vector3 operator *(Vector3 a, float b)
-        {
-            return new Vector3(a.x * b, a.y * b, a.z * b);
-        }
-    }
-
-    class Vector4
-    {
-        public float x, y, z, w;
-        public Vector4(float x, float y, float z, float w)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
-        }
-
-        // override + operator
-        public static Vector4 operator +(Vector4 a, Vector4 b)
-        {
-            return new Vector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
-        }
-
-        // override - operator
-        public static Vector4 operator -(Vector4 a, Vector4 b)
-        {
-            return new Vector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
-        }
-
-        // override * operator
-        public static Vector4 operator *(Vector4 a, float b)
-        {
-            return new Vector4(a.x * b, a.y * b, a.z * b, a.w * b);
-        }
-    }
-
     class Mesh
     {
         public Vector3[] vertices;
@@ -230,9 +144,15 @@ namespace ObjLibrary
 
     class MeshTools
     {
-        public static Mesh CopyMeshToPoints(Vector3[] points, Mesh mesh)
+        public static Mesh CopyMeshToPoints(Vector3[] points, Mesh mesh, Quaternion[] rotations = null)
         {
             Mesh outMesh = new Mesh();
+
+            if( (rotations == null) || (rotations != null && rotations.Length != points.Length) )
+            {
+                return outMesh;
+            }
+
             // Implementation for copying mesh to points
             if (mesh.vertices != null)
             {
@@ -261,7 +181,14 @@ namespace ObjLibrary
                 {
                     for (int j = 0; j < mesh.vertices.Length; j++)
                     {
-                        outMesh.vertices[i * mesh.vertices.Length + j] = mesh.vertices[j] + points[i];
+                        if (rotations != null)
+                        {
+                            outMesh.vertices[i * mesh.vertices.Length + j] = (Vector3.Transform(mesh.vertices[j], rotations[i])) + points[i];
+                        }
+                        else
+                        {
+                            outMesh.vertices[i * mesh.vertices.Length + j] = mesh.vertices[j] + points[i];
+                        }
                     }
                 }
 
@@ -319,7 +246,7 @@ namespace ObjLibrary
                     {
                         foreach (Vector3 vertex in mesh.vertices)
                         {
-                            sb.AppendFormat("v {0} {1} {2}\n", vertex.x, vertex.y, vertex.z);
+                            sb.AppendFormat("v {0} {1} {2}\n", vertex.X, vertex.Y, vertex.Z);
                         }
                         sb.AppendLine();
                         formatCount++;
@@ -329,7 +256,7 @@ namespace ObjLibrary
                     {
                         foreach (Vector3 normal in mesh.normals)
                         {
-                            sb.AppendFormat("vn {0} {1} {2}\n", normal.x, normal.y, normal.z);
+                            sb.AppendFormat("vn {0} {1} {2}\n", normal.X, normal.Y, normal.Z);
                         }
                         sb.AppendLine();
                         formatCount++;
@@ -339,7 +266,7 @@ namespace ObjLibrary
                     //{
                     //    foreach (Vector3 tangent in mesh.tangents)
                     //    {
-                    //        sb.AppendFormat("vtan {0} {1} {2}\n", tangent.x, tangent.y, tangent.z);
+                    //        sb.AppendFormat("vtan {0} {1} {2}\n", tangent.X, tangent.Y, tangent.Z);
                     //    }
                     //    sb.AppendLine();
                     //formatCount++;
@@ -349,7 +276,7 @@ namespace ObjLibrary
                     {
                         foreach (Vector2 uv in mesh.uvs0)
                         {
-                            sb.AppendFormat("vt {0} {1}\n", uv.x, uv.y);
+                            sb.AppendFormat("vt {0} {1}\n", uv.X, uv.Y);
                         }
                         sb.AppendLine();
                         formatCount++;
@@ -411,17 +338,17 @@ namespace ObjLibrary
         public static Vector2 RandomVector2(Vector2 min, Vector2 max)
         {
             return new Vector2(
-                RandomFloat(min.x, max.x),
-                RandomFloat(min.y, max.y)
+                RandomFloat(min.X, max.X),
+                RandomFloat(min.Y, max.Y)
             );
         }
 
         public static Vector3 RandomVector3(Vector3 min, Vector3 max)
         {
             return new Vector3(
-                RandomFloat(min.x, max.x),
-                RandomFloat(min.y, max.y),
-                RandomFloat(min.z, max.z)
+                RandomFloat(min.X, max.X),
+                RandomFloat(min.Y, max.Y),
+                RandomFloat(min.Z, max.Z)
             );
         }
     }
@@ -436,10 +363,16 @@ namespace ObjLibrary
             Mesh singleGrass = MeshLibrary.CreateSingleGrassMesh(7, 0.04f);
             // MeshTools.WriteMeshToObj(singleGrass, "singleGrass.obj");
 
-            Vector3[] instancePoints = new Vector3[10];
+            Vector3[] instancePoints = new Vector3[25];
             for (int i = 0; i < instancePoints.Length; i++)
             {
                 instancePoints[i] = RandomTools.RandomVector3(new Vector3(-1, -1, 0), new Vector3(1, 1, 0));
+            }
+
+            Quaternion[] instanceRotations = new Quaternion[instancePoints.Length];
+            for (int i = 0; i < instanceRotations.Length; i++)
+            {
+                instanceRotations[i] = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), RandomTools.RandomFloat(0, 360));
             }
             Mesh mergedMesh = MeshTools.CopyMeshToPoints(instancePoints, singleGrass);
             MeshTools.WriteMeshToObj(mergedMesh, "mergedGrass.obj");

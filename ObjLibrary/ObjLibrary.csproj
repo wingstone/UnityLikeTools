@@ -38,5 +38,8 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Numerics" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

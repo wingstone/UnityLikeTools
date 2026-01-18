@@ -9,65 +9,12 @@ namespace GeometryTools
     /// </summary>
     public class MeshLibrary
     {
-        /// <summary>Predefined cube mesh.</summary>
-        public static Mesh Cube;
-
-        static MeshLibrary()
-        {
-            Cube = new Mesh();
-            Cube.vertices = new Vector3[8]
-            {
-                new Vector3(-1, -1, -1),
-                new Vector3(1, -1, -1),
-                new Vector3(1, 1, -1),
-                new Vector3(-1, 1, -1),
-                new Vector3(-1, -1, 1),
-                new Vector3(1, -1, 1),
-                new Vector3(1, 1, 1),
-                new Vector3(-1, 1, 1)
-            };
-
-            // Maps control points to vertex indices for each face
-            var controlPointToVertexId = new Dictionary<int, int>
-            {
-                // Face 1 (Back)
-                { 0, 3 }, { 1, 2 }, { 2, 1 }, { 3, 0 },
-                // Face 2 (Left)
-                { 4, 4 }, { 5, 7 }, { 6, 3 }, { 7, 0 },
-                // Face 3 (Bottom)
-                { 8, 0 }, { 9, 1 }, { 10, 5 }, { 11, 4 },
-                // Face 4 (Top)
-                { 12, 7 }, { 13, 6 }, { 14, 2 }, { 15, 3 },
-                // Face 5 (Right)
-                { 16, 6 }, { 17, 5 }, { 18, 1 }, { 19, 2 },
-                // Face 6 (Front)
-                { 20, 4 }, { 21, 5 }, { 22, 6 }, { 23, 7 }
-            };
-
-            // Initialize triangle array
-            Cube.triangles = new int[36]
-            {
-                0,1,2,0,2,3,
-                4,5,6,4,6,7,
-                8,9,10,8,10,11,
-                12,13,14,12,14,15,
-                16,17,18,16,18,19,
-                20,21,22,20,22,23
-            };
-
-            // Remap control points to actual vertex indices
-            for (int i = 0; i < Cube.triangles.Length; i++)
-            {
-                Cube.triangles[i] = controlPointToVertexId[Cube.triangles[i]];
-            }
-        }
-
         /// <summary>
         /// Creates a single grass blade mesh with specified segment count and width.
         /// </summary>
         /// <param name="segmentCount">Number of segments along the blade length.</param>
         /// <param name="width">Width of the grass blade.</param>
-        public static Mesh CreateSingleGrassMesh(int segmentCount, float width)
+        public static Mesh CreateGrassBlade(int segmentCount, float width)
         {
             if (segmentCount < 1 || width <= 0)
                 throw new ArgumentException("segmentCount must be >= 1 and width must be > 0");

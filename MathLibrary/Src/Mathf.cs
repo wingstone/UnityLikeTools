@@ -223,5 +223,104 @@ namespace MathLibrary
         /// 立方
         /// </summary>
         public static float Cube(float value) => value * value * value;
+
+        /// <summary>
+        /// 判断一个数是否为质数
+        /// </summary>
+        private static bool IsPrime(int n)
+        {
+            if (n <= 1) return false;
+            if (n <= 3) return true;
+            if (n % 2 == 0 || n % 3 == 0) return false;
+            
+            for (int i = 5; i * i <= n; i += 6)
+            {
+                if (n % i == 0 || n % (i + 2) == 0)
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 获取第n个质数
+        /// </summary>
+        private static int GetPrime(int n)
+        {
+            if (n <= 0) return 2;
+            
+            int count = 0;
+            int candidate = 1;
+            
+            while (count <= n)
+            {
+                candidate++;
+                if (IsPrime(candidate))
+                {
+                    count++;
+                }
+            }
+            return candidate;
+        }
+
+        /// <summary>
+        /// Van der Corput序列生成（核心算法）
+        /// </summary>
+        private static float VanDerCorput(int n, int baseNumber)
+        {
+            float result = 0.0f;
+            float fraction = 1.0f / baseNumber;
+            int index = n;
+            
+            while (index > 0)
+            {
+                result += (index % baseNumber) * fraction;
+                index /= baseNumber;
+                fraction /= baseNumber;
+            }
+            
+            return result;
+        }
+
+        /// <summary>
+        /// 生成Halton序列
+        /// </summary>
+        /// <param name="index">点的索引（从0开始）</param>
+        /// <param name="baseNumberX">第一维的基数（必须是质数）</param>
+        /// <param name="baseNumberY">第二维的基数（必须是质数）</param>
+        /// <returns>Halton序列点</returns>
+        public static Vector2 Halton(int index, int baseNumberX, int baseNumberY)
+        {
+            if (baseNumberX <= 1 || !IsPrime(baseNumberX))
+                throw new ArgumentException("基数必须是大于1的质数", nameof(baseNumberX));
+            if (baseNumberY <= 1 || !IsPrime(baseNumberY))
+                throw new ArgumentException("基数必须是大于1的质数", nameof(baseNumberY));
+
+            Vector2 result = Vector2.zero;
+            int id = index + 1; // Halton序列通常从1开始
+
+            result.x = VanDerCorput(id, baseNumberX);
+            result.y = VanDerCorput(id, baseNumberY);
+
+            return result;
+        }
+    
+        /// <summary>
+        /// 生成二维Hammersley序列点（基础版本）
+        /// </summary>
+        /// <param name="index">点的索引（从0开始）</param>
+        /// <param name="sampleCount">采样数量</param>
+        /// <returns>二维Hammersley序列点</returns>
+        public static Vector2 Hammersley(int index, int sampleCount)
+        {
+            if (sampleCount <= 0) throw new ArgumentException("采样数量必须大于0");
+            if (index < 0 || index >= sampleCount) throw new ArgumentException("索引必须在0到采样数量之间");
+
+            Vector2 result = Vector2.zero;
+
+            result.x = (index + 0.5f) / sampleCount; // 偏移0.5以避免边界问题
+            result.y = VanDerCorput(index + 1, 2); // 通常使用基数2，从1开始，避免0的边界问题
+
+            return result;
+        }
     }
 }

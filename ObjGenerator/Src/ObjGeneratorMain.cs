@@ -24,7 +24,7 @@ class ObjGenerator
 
                 // Create a grass blade mesh
                 Console.WriteLine("Creating grass blade mesh...");
-                var singleGrass = MeshLibrary.CreateSingleGrassMesh(segmentCount: 7, width: 0.04f);
+                var singleGrass = MeshLibrary.CreateGrassBlade(segmentCount: 7, width: 0.04f);
 
                 // Generate random positions for 25 grass instances
                 Console.WriteLine("Generating 25 grass instances with random rotation...");

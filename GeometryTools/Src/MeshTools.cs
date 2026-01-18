@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 using MathLibrary;
 
 namespace GeometryTools
@@ -95,6 +96,94 @@ namespace GeometryTools
             }
 
             return outMesh;
+        }
+
+        /// <summary>
+        /// Creates a mesh by extruding a profile along a Bezier curve.
+        /// </summary>
+        /// <param name="curvePoints">Points defining the path curve.</param>
+        /// <param name="profileRadius">Radius of the circular profile at each point.</param>
+        /// <param name="profileSegments">Number of segments in the circular profile.</param>
+        /// <returns>Mesh created by extruding the profile along the curve.</returns>
+        public static Mesh CreateExtrusionMesh(Vector3[] curvePoints, float profileRadius, int profileSegments)
+        {
+            if (curvePoints == null || curvePoints.Length < 2)
+                throw new ArgumentException("curvePoints must have at least 2 points");
+            if (profileSegments < 3)
+                throw new ArgumentException("profileSegments must be at least 3");
+
+            var mesh = new Mesh();
+            var vertices = new List<Vector3>();
+            var triangles = new List<int>();
+
+            // Generate vertices for each profile along the curve
+            for (int i = 0; i < curvePoints.Length; i++)
+            {
+                Vector3 curvePoint = curvePoints[i];
+
+                // Calculate tangent direction
+                Vector3 tangent = Vector3.zero;
+                if (i == 0)
+                {
+                    tangent = (curvePoints[1] - curvePoints[0]).Normalized;
+                }
+                else if (i == curvePoints.Length - 1)
+                {
+                    tangent = (curvePoints[i] - curvePoints[i - 1]).Normalized;
+                }
+                else
+                {
+                    tangent = ((curvePoints[i + 1] - curvePoints[i - 1]) * 0.5f).Normalized;
+                }
+
+                // Calculate perpendicular vectors for profile
+                Vector3 normal = Vector3.zero;
+                if (Mathf.Abs(tangent.x) < 0.9f)
+                    normal = new Vector3(1, 0, 0);
+                else
+                    normal = new Vector3(0, 1, 0);
+
+                Vector3 binormal = Vector3.Cross(tangent, normal).Normalized;
+                normal = Vector3.Cross(binormal, tangent).Normalized;
+
+                // Generate circular profile vertices
+                for (int j = 0; j < profileSegments; j++)
+                {
+                    float angle = (j / (float)profileSegments) * Mathf.Tau;
+                    float x = Mathf.Cos(angle) * profileRadius;
+                    float y = Mathf.Sin(angle) * profileRadius;
+
+                    Vector3 vertex = curvePoint + normal * x + binormal * y;
+                    vertices.Add(vertex);
+                }
+            }
+
+            // Generate triangles connecting adjacent profiles
+            int profileVertexCount = profileSegments;
+            for (int i = 0; i < curvePoints.Length - 1; i++)
+            {
+                int baseIdx = i * profileVertexCount;
+                int nextBaseIdx = (i + 1) * profileVertexCount;
+
+                for (int j = 0; j < profileSegments; j++)
+                {
+                    int jNext = (j + 1) % profileSegments;
+
+                    // First triangle
+                    triangles.Add(baseIdx + j);
+                    triangles.Add(nextBaseIdx + j);
+                    triangles.Add(baseIdx + jNext);
+
+                    // Second triangle
+                    triangles.Add(baseIdx + jNext);
+                    triangles.Add(nextBaseIdx + j);
+                    triangles.Add(nextBaseIdx + jNext);
+                }
+            }
+
+            mesh.vertices = vertices.ToArray();
+            mesh.triangles = triangles.ToArray();
+            return mesh;
         }
 
         /// <summary>

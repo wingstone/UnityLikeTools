@@ -63,10 +63,11 @@ class Demo
                 }
             }
 
-            // Export to OBJ file using ModelIOTools
-            string outputPath = "mergedGrass.obj";
+            // Export to USD file using ModelIOTools
+            string outputPath = "mergedGrass.usd";
             Console.WriteLine($"Writing mesh to {outputPath}...");
-            ObjFileHandler.WriteMesh(mergedMesh, outputPath);
+            // ObjFileHandler.WriteMesh(mergedMesh, outputPath);
+            UsdFileHandler.WriteMesh(mergedMesh, outputPath);
 
             Console.WriteLine();
             Console.WriteLine("========== Success ==========");

@@ -136,16 +136,30 @@ namespace ModelIOTools
                 }
             }
 
-            // Convert UV coordinates if available
-            System.Numerics.Vector2[]? uvs = null;
+            // Convert UV0 coordinates if available
+            System.Numerics.Vector2[]? uvs0 = null;
             if (mesh.uvs0 != null && mesh.uvs0.Length > 0)
             {
-                uvs = new System.Numerics.Vector2[mesh.uvs0.Length];
+                uvs0 = new System.Numerics.Vector2[mesh.uvs0.Length];
                 for (int i = 0; i < mesh.uvs0.Length; i++)
                 {
-                    uvs[i] = new System.Numerics.Vector2(
+                    uvs0[i] = new System.Numerics.Vector2(
                         mesh.uvs0[i].x,
                         mesh.uvs0[i].y
+                    );
+                }
+            }
+
+            // Convert UV1 coordinates if available
+            System.Numerics.Vector2[]? uvs1 = null;
+            if (mesh.uvs1 != null && mesh.uvs1.Length > 0)
+            {
+                uvs1 = new System.Numerics.Vector2[mesh.uvs1.Length];
+                for (int i = 0; i < mesh.uvs1.Length; i++)
+                {
+                    uvs1[i] = new System.Numerics.Vector2(
+                        mesh.uvs1[i].x,
+                        mesh.uvs1[i].y
                     );
                 }
             }
@@ -170,8 +184,11 @@ namespace ModelIOTools
             if (normals != null)
                 primitive.WithVertexAccessor("NORMAL", normals);
 
-            if (uvs != null)
-                primitive.WithUVSsAccessor("TEXCOORD_0", uvs);
+            if (uvs0 != null)
+                primitive.WithVertexAccessor("TEXCOORD_0", uvs0);
+
+            if (uvs1 != null)
+                primitive.WithVertexAccessor("TEXCOORD_1", uvs1);
 
             return glMesh;
         }

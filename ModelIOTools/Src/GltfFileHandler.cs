@@ -51,7 +51,9 @@ namespace ModelIOTools
         /// </summary>
         /// <param name="mesh">Mesh to export.</param>
         /// <param name="filePath">Output file path (.gltf for JSON or .glb for binary).</param>
-        public static void WriteMesh(GeometryTools.Mesh mesh, string filePath)
+        /// <param name="transferCoord">If true, transfers coordinate system (not implemented).</param>
+        /// <param name="reverseUVy">If true, the Y-axis of UV coordinates is reversed.</param>
+        public static void WriteMesh(GeometryTools.Mesh mesh, string filePath, bool transferCoord = true, bool reverseUVy = true)
         {
             if (mesh == null)
                 throw new ArgumentNullException(nameof(mesh));
@@ -72,7 +74,7 @@ namespace ModelIOTools
                 var node = scene.CreateNode("MeshNode");
 
                 // Create mesh and primitives
-                var glMesh = CreateGltfMesh(mesh, model, "Mesh");
+                var glMesh = CreateGltfMesh(mesh, model, "Mesh", transferCoord, reverseUVy);
                 node.Mesh = glMesh;
 
                 // Save the model
@@ -99,7 +101,7 @@ namespace ModelIOTools
         /// <param name="model">Target glTF model that will own the mesh.</param>
         /// <param name="meshName">Optional mesh name.</param>
         /// <returns>Created glTF mesh instance.</returns>
-        public static SharpGLTF.Schema2.Mesh CreateGltfMesh(GeometryTools.Mesh mesh, ModelRoot model, string meshName = "Mesh")
+        public static SharpGLTF.Schema2.Mesh CreateGltfMesh(GeometryTools.Mesh mesh, ModelRoot model, string meshName = "Mesh", bool transferCoord = true, bool reverseUVy = true)
         {
             if (mesh == null)
                 throw new ArgumentNullException(nameof(mesh));
@@ -114,11 +116,22 @@ namespace ModelIOTools
             var vertices = new System.Numerics.Vector3[mesh.vertices.Length];
             for (int i = 0; i < mesh.vertices.Length; i++)
             {
-                vertices[i] = new System.Numerics.Vector3(
-                    mesh.vertices[i].x,
-                    mesh.vertices[i].y,
-                    mesh.vertices[i].z
-                );
+                if(transferCoord)
+                {
+                    vertices[i] = new System.Numerics.Vector3(
+                        mesh.vertices[i].x,
+                        mesh.vertices[i].z,
+                        mesh.vertices[i].y
+                    );
+                }
+                else
+                {
+                    vertices[i] = new System.Numerics.Vector3(
+                        mesh.vertices[i].x,
+                        mesh.vertices[i].y,
+                        mesh.vertices[i].z
+                    );
+                }
             }
 
             // Convert normals if available
@@ -128,11 +141,22 @@ namespace ModelIOTools
                 normals = new System.Numerics.Vector3[mesh.normals.Length];
                 for (int i = 0; i < mesh.normals.Length; i++)
                 {
-                    normals[i] = new System.Numerics.Vector3(
-                        mesh.normals[i].x,
-                        mesh.normals[i].y,
-                        mesh.normals[i].z
-                    );
+                    if (transferCoord)
+                    {
+                        normals[i] = new System.Numerics.Vector3(
+                            mesh.normals[i].x,
+                            mesh.normals[i].z,
+                            mesh.normals[i].y
+                        );
+                    }
+                    else
+                    {
+                        normals[i] = new System.Numerics.Vector3(
+                            mesh.normals[i].x,
+                            mesh.normals[i].y,
+                            mesh.normals[i].z
+                        );
+                    }
                 }
             }
 
@@ -143,10 +167,20 @@ namespace ModelIOTools
                 uvs0 = new System.Numerics.Vector2[mesh.uvs0.Length];
                 for (int i = 0; i < mesh.uvs0.Length; i++)
                 {
-                    uvs0[i] = new System.Numerics.Vector2(
-                        mesh.uvs0[i].x,
-                        mesh.uvs0[i].y
-                    );
+                    if (reverseUVy)
+                    {
+                        uvs0[i] = new System.Numerics.Vector2(
+                            mesh.uvs0[i].x,
+                            1.0f- mesh.uvs0[i].y
+                        );
+                    }
+                    else
+                    {
+                        uvs0[i] = new System.Numerics.Vector2(
+                            mesh.uvs0[i].x,
+                            mesh.uvs0[i].y
+                        );
+                    }
                 }
             }
 
@@ -157,10 +191,20 @@ namespace ModelIOTools
                 uvs1 = new System.Numerics.Vector2[mesh.uvs1.Length];
                 for (int i = 0; i < mesh.uvs1.Length; i++)
                 {
-                    uvs1[i] = new System.Numerics.Vector2(
-                        mesh.uvs1[i].x,
-                        mesh.uvs1[i].y
-                    );
+                    if (reverseUVy)
+                    {
+                        uvs1[i] = new System.Numerics.Vector2(
+                            mesh.uvs1[i].x,
+                            1.0f - mesh.uvs1[i].y
+                        );
+                    }
+                    else
+                    {
+                        uvs1[i] = new System.Numerics.Vector2(
+                            mesh.uvs1[i].x,
+                            mesh.uvs1[i].y
+                        );
+                    }
                 }
             }
 

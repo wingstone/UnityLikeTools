@@ -21,7 +21,7 @@ class Demo
         var singleGrass = MeshLibrary.CreateGrassBlade(segmentCount: 8, width: 0.04f);
 
         // Generate random positions for 50 grass instances
-        var instanceCount = 18;
+        var instanceCount = 50;
         Console.WriteLine($"Generating {instanceCount} grass instances with random rotation...");
         var instancePoints = new Vector3[instanceCount];
         var instanceRotations = new Quaternion[instanceCount];

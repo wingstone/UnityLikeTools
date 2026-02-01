@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using MathLibrary;
 
+// Mesh coordinate is left-handed, Z-up, Y-forward
+
 namespace GeometryTools
 {
     /// <summary>
@@ -14,7 +16,7 @@ namespace GeometryTools
         /// </summary>
         /// <param name="segmentCount">Number of segments along the blade length.</param>
         /// <param name="width">Width of the grass blade.</param>
-        public static Mesh CreateGrassBlade(int segmentCount, float width)
+        public static Mesh CreateGrassBlade(int segmentCount, float width, bool useUpNormal = false)
         {
             if (segmentCount < 1 || width <= 0)
                 throw new ArgumentException("segmentCount must be >= 1 and width must be > 0");
@@ -39,6 +41,16 @@ namespace GeometryTools
             }
             mesh.vertices[vertexCount - 1] = new Vector3(0, 0, 1.0f);
             mesh.uvs0[vertexCount - 1] = new Vector2(0.5f, 1.0f);
+
+            // Create normals
+            mesh.normals = new Vector3[vertexCount];
+            for (int i = 0; i < vertexCount; i++)
+            {
+                if (useUpNormal)
+                    mesh.normals[i] = new Vector3(0, 0, 1);
+                else
+                    mesh.normals[i] = new Vector3(0, 1, 0);
+            }
 
             // Create triangles
             int triangleCount = ((segmentCount - 1) * 2 + 1) * 3;

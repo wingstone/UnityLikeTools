@@ -18,7 +18,7 @@ class Demo
 
         // Create a grass blade mesh
         Console.WriteLine("Creating grass blade mesh...");
-        var singleGrass = MeshLibrary.CreateGrassBlade(segmentCount: 8, width: 0.04f, useUpNormal: true);
+        var singleGrass = MeshLibrary.CreateGrassBlade(segmentCount: 8, width: 0.04f, useUpNormal: false);
 
         // Generate random positions for 50 grass instances
         var instanceCount = 50;
@@ -62,7 +62,7 @@ class Demo
         }
 
         // Export to GLTF file using ModelIOTools
-        string outputPath = "mergedGrassUpNormal.gltf";
+        string outputPath = "mergedGrass.gltf";
         Console.WriteLine($"Writing mesh to {outputPath}...");
         // ObjFileHandler.WriteMesh(mergedMesh, outputPath);
         GltfFileHandler.WriteMesh(mergedMesh, outputPath);

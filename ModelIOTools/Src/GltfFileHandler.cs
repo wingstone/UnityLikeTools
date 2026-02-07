@@ -195,7 +195,7 @@ namespace ModelIOTools
                     {
                         uvs1[i] = new System.Numerics.Vector2(
                             mesh.uvs1[i].x,
-                            1.0f - mesh.uvs1[i].y
+                            mesh.uvs1[i].y
                         );
                     }
                     else

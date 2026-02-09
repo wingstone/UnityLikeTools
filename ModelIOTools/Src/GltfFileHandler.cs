@@ -134,6 +134,22 @@ namespace ModelIOTools
                 }
             }
 
+            // Conver colors if available
+            System.Numerics.Vector4[]? colors = null;
+            if (mesh.colors != null && mesh.colors.Length > 0)
+            {
+                colors = new System.Numerics.Vector4[mesh.colors.Length];
+                for (int i = 0; i < mesh.colors.Length; i++)
+                {
+                    colors[i] = new System.Numerics.Vector4(
+                        mesh.colors[i].x,
+                        mesh.colors[i].y,
+                        mesh.colors[i].z,
+                        mesh.colors[i].w
+                    );
+                }
+            }
+
             // Convert normals if available
             System.Numerics.Vector3[]? normals = null;
             if (mesh.normals != null && mesh.normals.Length > 0)
@@ -224,6 +240,9 @@ namespace ModelIOTools
             var primitive = glMesh.CreatePrimitive();
             primitive.WithVertexAccessor("POSITION", vertices);
             primitive.WithIndicesAccessor(PrimitiveType.TRIANGLES, indices);
+
+            if (colors != null)
+                primitive.WithVertexAccessor("COLOR_0", colors);
 
             if (normals != null)
                 primitive.WithVertexAccessor("NORMAL", normals);

@@ -7,6 +7,11 @@ namespace MathLibrary
     /// </summary>
     public struct Color : IEquatable<Color>
     {
+        public float x => r;
+        public float y => g;
+        public float z => b;
+        public float w => a;
+
         public float r;
         public float g;
         public float b;

@@ -61,6 +61,18 @@ class Demo
             }
         }
 
+        // Custom vertex color for each instance
+        mergedMesh.colors = new Color[mergedMesh.vertices!.Length];
+        for (int i = 0; i < instanceCount; i++)
+        {
+            Color instanceColor = RandomUtil.Color(); // Random color for each instance
+            for (int j = 0; j < singleGrass.vertices!.Length; j++)
+            {
+                int idx = i * singleGrass.vertices!.Length + j;
+                mergedMesh.colors[idx] = instanceColor;
+            }
+        }
+
         // Export to GLTF file using ModelIOTools
         string outputPath = "mergedGrass.gltf";
         Console.WriteLine($"Writing mesh to {outputPath}...");

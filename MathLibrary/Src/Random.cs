@@ -35,6 +35,11 @@ namespace MathLibrary
         public static float Value => (float)_random.NextDouble();
 
         /// <summary>
+        /// 返回一个随机颜色
+        /// </summary>
+        public static Color Color() => new Color(Range(), Range(), Range());
+
+        /// <summary>
         /// 返回-1到1之间的随机浮点数
         /// </summary>
         public static float SignedRange() => Range(-1f, 1f);

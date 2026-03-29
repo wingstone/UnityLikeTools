@@ -76,7 +76,6 @@ class Demo
         // Export to GLTF file using ModelIOTools
         string outputPath = "mergedGrass.gltf";
         Console.WriteLine($"Writing mesh to {outputPath}...");
-        // ObjFileHandler.WriteMesh(mergedMesh, outputPath);
         GltfFileHandler.WriteMesh(mergedMesh, outputPath);
 
         Console.WriteLine();
@@ -99,14 +98,36 @@ class Demo
         var curve = BezierCurve.GenerateCubicBezierCurve(startPoint, controlPoint1, controlPoint2, endPoint, segmentCount: 7);
         var bezierMesh = MeshTools.CreateExtrusionMesh(curve, profileRadius: 2f, profileSegments: 8);
 
-        // Export to OBJ file using ModelIOTools
-        string bezierOutputPath = "bezierCurve.obj";
+        // Export to GLTF file using ModelIOTools
+        string bezierOutputPath = "bezierCurve.gltf";
         Console.WriteLine($"Writing Bezier curve mesh to {bezierOutputPath}...");
-        ObjFileHandler.WriteMesh(bezierMesh, bezierOutputPath);
+        GltfFileHandler.WriteMesh(bezierMesh, bezierOutputPath);
 
         Console.WriteLine();
         Console.WriteLine("========== Success ==========");
         Console.WriteLine($"Exported Bezier curve mesh with {bezierMesh.vertices?.Length ?? 0} vertices and {(bezierMesh.triangles?.Length ?? 0) / 3} triangles");
+    }
+
+    static void GeneratePlaneMesh()
+    {
+        Console.WriteLine();
+        Console.WriteLine("========== Plane Mesh Generator ==========");
+
+        Console.WriteLine("Creating plane mesh...");
+        float width = 10f;
+        float height = 10f;
+        int widthSegments = 100;
+        int heightSegments = 100;
+
+        var planeMesh = MeshLibrary.CreatePlane(width, height, widthSegments, heightSegments);
+
+        string outputPath = "plane.gltf";
+        Console.WriteLine($"Writing plane mesh to {outputPath}...");
+        GltfFileHandler.WriteMesh(planeMesh, outputPath);
+
+        Console.WriteLine();
+        Console.WriteLine("========== Success ==========");
+        Console.WriteLine($"Exported plane mesh with {planeMesh.vertices?.Length ?? 0} vertices and {(planeMesh.triangles?.Length ?? 0) / 3} triangles");
     }
 
     static void Main(string[] args)
@@ -116,6 +137,8 @@ class Demo
             GenerateGrassMesh();
 
             GenerateBezierCurveMesh();
+
+            GeneratePlaneMesh();
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();

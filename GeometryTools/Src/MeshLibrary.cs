@@ -258,6 +258,8 @@ namespace GeometryTools
         {
             Mesh mesh = new Mesh();
             List<Vector3> vertices = new List<Vector3>();
+            List<Vector2> uv0 = new List<Vector2>();
+            List<Vector3> normals = new List<Vector3>();
             List<int> triangles = new List<int>();
 
             float halfWidth = width * 0.5f;
@@ -274,7 +276,9 @@ namespace GeometryTools
                     float xPercent = x / (float)widthSegments;
                     float xPos = -halfWidth + xPercent * width;
 
-                    vertices.Add(new Vector3(xPos, 0, yPos));
+                    vertices.Add(new Vector3(xPos, yPos, 0));
+                    uv0.Add(new Vector2((float)x/widthSegments, (float)y/heightSegments));
+                    normals.Add(new Vector3(0, 0, 1));
                 }
             }
 
@@ -289,17 +293,19 @@ namespace GeometryTools
                     int d = c + 1;
 
                     triangles.Add(a);
-                    triangles.Add(c);
                     triangles.Add(b);
+                    triangles.Add(c);
 
                     triangles.Add(b);
-                    triangles.Add(c);
                     triangles.Add(d);
+                    triangles.Add(c);
                 }
             }
 
             mesh.vertices = vertices.ToArray();
             mesh.triangles = triangles.ToArray();
+            mesh.uvs0 = uv0.ToArray();
+            mesh.normals = normals.ToArray();
             return mesh;
         }
 
